@@ -84,38 +84,6 @@ if show_dataset:
 
 # Gráficos e tabelas
 
-# Adicionando um gráfico de barras para mostrar a distribuição de gênero dos estudantes
-st.subheader("Distribuição de Gênero dos Estudantes")
-gender_count = data['sex'].value_counts()
-fig, ax = plt.subplots()
-if graph1_type == "Pizza":
-    ax.pie(gender_count.values, labels=gender_count.index, autopct='%1.1f%%')
-    ax.set_title('Distribuição de Gênero dos Estudantes')
-else:
-    sns.barplot(x=gender_count.index, y=gender_count.values)
-    ax.set_xlabel('Gênero')
-    ax.set_ylabel('Número de Estudantes')
-st.pyplot(fig)
-
-# Adicionando uma tabela para mostrar a média de idade dos estudantes por escola
-st.subheader("Média de Idade dos Estudantes por Escola")
-school_mean_age = data.groupby('school')['age'].mean()
-st.table(school_mean_age)
-
-# Adicionando um gráfico de dispersão para mostrar a relação entre o tempo de estudo semanal e o número de faltas
-st.subheader("Relação entre Tempo de Estudo Semanal e Número de Faltas")
-fig, ax = plt.subplots()
-sns.scatterplot(x=data['studytime'], y=data['absences'])
-ax.set_xlabel('Tempo de Estudo Semanal')
-ax.set_ylabel('Número de Faltas')
-st.pyplot(fig)
-
-# Adicionando uma seção para mostrar as estatísticas descritivas dos atributos numéricos do dataset
-st.subheader("Estatísticas Descritivas dos Atributos Numéricos")
-st.write(data.describe())
-
-############################################################################
-
 # Adicionando uma tabela para mostrar a média de idade dos estudantes por escola
 st.subheader("Média de Idade dos Estudantes por Escola")
 school_mean_age = data.groupby('school')['age'].mean()
@@ -126,7 +94,7 @@ ax.set_ylabel('Media da idade dos Estudantes')
 st.pyplot(fig)
 
 
-# moda do endereço dos alunos na escola MS 
+# Moda do endereço dos alunos na escola MS 
 st.subheader("Moda do endereço dos alunos na escola MS")
 school_moda_address = data[data.school == 'MS']['address'].mode()
 match school_moda_address.values[0]:
@@ -137,7 +105,96 @@ match school_moda_address.values[0]:
     case _:
         st.write("Não informado")
 
+################################
 
 # Mediana do tempo de viagem dos alunos que estudam na escola GP 
-st.subheader("Mediana do tempo de viagem dos alunos que estudam na escola GP")
-school_median_traveltime = data.groupby('school')['traveltime'].median()
+st.subheader("Mediana do Tempo de Viagem dos Alunos das Escolas")
+gp_students = data[data['school'] == 'GP']
+ms_students = data[data['school'] == 'MS']
+
+median_travel_time_gp = gp_students['traveltime'].median()
+median_travel_time_ms = ms_students['traveltime'].median()
+
+fig, ax = plt.subplots()
+sns.barplot(x=['GP', 'MS'], y=[median_travel_time_gp, median_travel_time_ms])
+ax.set_ylabel('Tempo de Viagem (Mediana)')
+st.pyplot(fig)
+
+
+# Desvio padrão da idade dos alunos que têm apoio educacional extra na escola MS
+st.subheader("Desvio padrão da idade dos alunos que têm apoio educacional extra na escola")
+gp_students_extra_support = data[(data['school'] == 'GP') & (data['schoolsup'] == 'yes')]
+ms_students_extra_support = data[(data['school'] == 'MS') & (data['schoolsup'] == 'yes')]
+
+std_dev_age_ms = ms_students_extra_support['age'].std()
+std_dev_age_gp = gp_students_extra_support['age'].std()
+
+fig, ax = plt.subplots()
+sns.barplot(x=['GP','MS'], y=[std_dev_age_gp, std_dev_age_ms])
+ax.set_ylabel('Desvio Padrão da Idade')
+st.pyplot(fig)
+
+
+#Média do Tempo Semanal de Estudo dos Alunos com Pais Separados na Escola GP
+st.subheader("Média do Tempo Semanal de Estudo dos Alunos com Pais Separados na Escola")
+gp_students_parents_apart = data[(data['school'] == 'GP') & (data['Pstatus'] == 'A')]
+ms_students_parents_apart = data[(data['school'] == 'MS') & (data['Pstatus'] == 'A')]
+
+mean_study_time_gp = gp_students_parents_apart['studytime'].mean()
+mean_study_time_ms = ms_students_parents_apart['studytime'].mean()
+
+fig, ax = plt.subplots()
+sns.barplot(x=['GP', 'MS'], y=[mean_study_time_gp, mean_study_time_ms])
+ax.set_ylabel('Tempo Semanal de Estudo (Média)')
+st.pyplot(fig)
+
+##########################
+#Moda do motivo pelo qual os alunos escolheram a escola MS
+st.subheader("Moda do motivo pelo qual os alunos escolheram a escola MS")
+# Filtrando os dados dos alunos da escola MS
+ms_students = data[data['school'] == 'MS']
+
+# Calculando a moda do motivo de escolha para a escola MS
+mode_reason_ms = ms_students['reason'].mode()
+
+# Criando uma tabela para mostrar a moda do motivo de escolha
+mode_reason_table_ms = pd.DataFrame({'Escola': ['MS'], 'Moda do Motivo de Escolha': [mode_reason_ms]})
+mode_reason_table_ms
+###########################
+
+#Mediana do número de faltas dos alunos que frequentam a escola GP
+st.subheader("Mediana do número de faltas dos alunos que frequentam a escola")
+gp_students = data[data['school'] == 'GP']
+ms_students = data[data['school'] == 'MS']
+
+median_absences_gp = gp_students['absences'].median()
+median_absences_ms = ms_students['absences'].median()
+
+fig, ax = plt.subplots()
+sns.barplot(x=['GP', 'MS'], y=[median_absences_gp, median_absences_ms])
+ax.set_ylabel('Mediana do Número de Faltas')
+st.pyplot(fig)
+
+
+#Desvio padrão do nível de saúde dos alunos que frequentam atividades extracurriculares na escola MS
+st.subheader("Desvio padrão do nível de saúde dos alunos que frequentam atividades extracurriculares na escola MS")
+gp_activities_students = data[(data['school'] == 'GP') & (data['activities'] == 'yes')]
+ms_activities_students = data[(data['school'] == 'MS') & (data['activities'] == 'yes')]
+
+std_health_gp = gp_activities_students['health'].std()
+std_health_ms = ms_activities_students['health'].std()
+
+fig, ax = plt.subplots()
+sns.barplot(x=['GP', 'MS'], y=[std_health_gp, std_health_ms])
+ax.set_ylabel('Desvio Padrão do Nível de Saúde')
+st.pyplot(fig)
+
+
+#Alunos já cumpriram as horas extracurriculares
+
+#Moda do consumo de álcool dos alunos da escola MS durante a semana de trabalho
+st.subheader('Moda do Consumo de Álcool (MS - Semana de Trabalho)')
+ms_students = data[data['school'] == 'MS']
+workday_alcohol_mode = ms_students['Dalc'].mode()
+table = pd.DataFrame({'Moda do Consumo de Álcool (MS - Semana de Trabalho)': workday_alcohol_mode})
+st.dataframe(table)
